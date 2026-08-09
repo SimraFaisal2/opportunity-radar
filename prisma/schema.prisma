@@ -1,0 +1,93 @@
+// Unified database schema
+// Merges: old Python/FastAPI SQLite RSS-scraper DB + new Kanban/CV-matcher/Analytics app
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // e.g. "file:./dev.db"
+}
+
+// ---------------------------------------------------------------------------
+// Feature 1: Live Opportunities Board
+// Populated by the RSS sync route (app/api/opportunities/sync)
+// ---------------------------------------------------------------------------
+// Note: SQLite has no native enum type, so Degree and ApplicationStatus are
+// stored as strings with the allowed values documented on each field.
+model Opportunity {
+  id          String   @id @default(cuid())
+  company     String
+  title       String
+  description String?
+  deadline    DateTime?
+  degree      String   @default("ANY") // "BACHELOR" | "MASTER" | "PHD" | "ANY"
+  type        String   @default("OTHER") // "INTERNSHIP" | "RESEARCH_INTERNSHIP" | "SCHOLARSHIP" | "OTHER" — lets the board split listings by kind
+  countries   String   // comma-separated list of eligible countries/regions, e.g. "Global" or "US,UK,EU"
+  eligibility String?  // human-readable eligibility requirements (who can apply)
+  applyUrl    String
+  sourceFeed  String   // "Scholarships Corner" | "Opportunities Corner"
+  guid        String   @unique // RSS guid/link, used to dedupe on re-sync
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  // if the user tracks it, we link to the Application it became
+  application Application?
+}
+
+// ---------------------------------------------------------------------------
+// Feature 2: Kanban Application Pipeline
+// ---------------------------------------------------------------------------
+model Application {
+  id            String     @id @default(cuid())
+  company       String
+  role          String
+  status        String     @default("APPLIED") // "APPLIED" | "SCREENING" | "INTERVIEW" | "OFFER" | "REJECTED"
+  salaryRange   String?
+  jobLink       String?
+  deadline      DateTime? // when the application/opportunity actually closes (calendar view)
+  appliedDate   DateTime   @default(now())
+  notes         String?
+  order         Int        @default(0) // position within its column, for stable drag ordering
+
+  opportunityId String?    @unique
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id])
+
+  cvMatch       CvMatchResult?
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Feature 3: AI CV Matcher results (cached per application)
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Accounts: simple email/password login + signup
+// ---------------------------------------------------------------------------
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   // scrypt hash, format "scrypt:<salt>:<hash>" — never plaintext
+  name         String?
+  createdAt    DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Feature 3: AI CV Matcher results (cached per application)
+// ---------------------------------------------------------------------------
+model CvMatchResult {
+  id            String      @id @default(cuid())
+  applicationId String      @unique
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  matchScore    Int      // 0-100
+  strengths     String   // JSON-encoded string[]
+  gaps          String   // JSON-encoded string[]
+  summary       String
+
+  createdAt     DateTime @default(now())
+}

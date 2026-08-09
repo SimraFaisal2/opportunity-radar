@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Environment — never commit real secrets
+.env
+.env.local
+.env.*.local
+
+# SQLite database files (regenerate via scripts/ — see README)
+prisma/dev.db
+prisma/dev.db.*
+*.db
+*.db-journal
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# TypeScript build info
+*.tsbuildinfo

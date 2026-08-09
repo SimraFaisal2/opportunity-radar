@@ -5,6 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { scoreOpportunity } from "@/lib/cv-heuristic";
 import { normalizeCountriesField } from "@/lib/countries";
 
+// PDF parsing + a Gemini call can exceed Vercel's default 10s Hobby limit.
+export const maxDuration = 60;
+
 // POST /api/cv-match/suggest
 // multipart/form-data: cv (PDF file), apiKey (optional string).
 // No key  → score the whole board locally (free, offline, nothing leaves the server).

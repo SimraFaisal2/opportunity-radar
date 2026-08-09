@@ -1,0 +1,93 @@
+// ⚠️ PRODUCTION SCHEMA (PostgreSQL) — used for Vercel + Neon deploys.
+// Keep this file in sync with schema.prisma (local SQLite dev). The only
+// intentional differences are the datasource provider/url and this header.
+//
+// Generate the client against this schema with:
+//   prisma generate --schema prisma/schema.postgres.prisma
+// Push/create tables on the production database with:
+//   prisma db push --schema prisma/schema.postgres.prisma
+// (both read DATABASE_URL from the environment — set it to the Neon URL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // e.g. "postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require"
+}
+
+// ---------------------------------------------------------------------------
+// Feature 1: Live Opportunities Board
+// ---------------------------------------------------------------------------
+model Opportunity {
+  id          String   @id @default(cuid())
+  company     String
+  title       String
+  description String?
+  deadline    DateTime?
+  degree      String   @default("ANY") // "BACHELOR" | "MASTER" | "PHD" | "ANY"
+  type        String   @default("OTHER") // "INTERNSHIP" | "RESEARCH_INTERNSHIP" | "SCHOLARSHIP" | "OTHER"
+  countries   String   // comma-separated list of eligible countries/regions
+  eligibility String?
+  applyUrl    String
+  sourceFeed  String
+  guid        String   @unique
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  application Application?
+}
+
+// ---------------------------------------------------------------------------
+// Feature 2: Kanban Application Pipeline
+// ---------------------------------------------------------------------------
+model Application {
+  id            String     @id @default(cuid())
+  company       String
+  role          String
+  status        String     @default("APPLIED") // "APPLIED" | "SCREENING" | "INTERVIEW" | "OFFER" | "REJECTED"
+  salaryRange   String?
+  jobLink       String?
+  deadline      DateTime?
+  appliedDate   DateTime   @default(now())
+  notes         String?
+  order         Int        @default(0)
+
+  opportunityId String?    @unique
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id])
+
+  cvMatch       CvMatchResult?
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Accounts: simple email/password login + signup
+// ---------------------------------------------------------------------------
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   // scrypt hash, format "scrypt:<salt>:<hash>" — never plaintext
+  name         String?
+  createdAt    DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Feature 3: AI CV Matcher results (cached per application)
+// ---------------------------------------------------------------------------
+model CvMatchResult {
+  id            String      @id @default(cuid())
+  applicationId String      @unique
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  matchScore    Int      // 0-100
+  strengths     String   // JSON-encoded string[]
+  gaps          String   // JSON-encoded string[]
+  summary       String
+
+  createdAt     DateTime @default(now())
+}

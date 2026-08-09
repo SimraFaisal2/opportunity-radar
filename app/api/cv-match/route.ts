@@ -4,6 +4,9 @@ import pdfParse from "pdf-parse";
 import { prisma } from "@/lib/prisma";
 import { heuristicMatch } from "@/lib/cv-heuristic";
 
+// PDF parsing + a Gemini call can exceed Vercel's default 10s Hobby limit.
+export const maxDuration = 60;
+
 // POST /api/cv-match
 // multipart/form-data: cv (PDF file), jobDescription (string), apiKey (string),
 // applicationId (optional string) — if present, caches the result on that card.

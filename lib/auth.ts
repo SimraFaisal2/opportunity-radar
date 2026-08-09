@@ -15,7 +15,16 @@ const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
 const SCRYPT_KEYLEN = 64;
 
 function getSecret(): string {
-  return process.env.AUTH_SECRET || "dev-insecure-secret-change-me";
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) {
+    // Local dev is fine with the fallback, but production must fail loudly
+    // rather than ship with a publicly-known signing key.
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET is not set — required in production. Generate one and add it to your Vercel env vars (see DEPLOYMENT.md).");
+    }
+    return "dev-insecure-secret-change-me";
+  }
+  return secret;
 }
 
 // ---------------------------------------------------------------------------

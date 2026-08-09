@@ -82,6 +82,8 @@ Then hit **Sync** on `/board` to pull the latest RSS feed items.
 
 **CV Matcher:** no key needed — it falls back to the local heuristic. For AI analysis, grab a free key at https://aistudio.google.com/apikey and paste it on `/cv-match` (stored in your browser only).
 
+**Deploying?** See **[DEPLOYMENT.md](./DEPLOYMENT.md)** — production runs on Neon Postgres (SQLite can't run on Vercel), with a dedicated `schema.postgres.prisma`, `db:push:prod`/`db:seed:prod` scripts, and the two env vars (`DATABASE_URL`, `AUTH_SECRET`) to set in Vercel.
+
 ## Project structure
 
 ```

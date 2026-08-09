@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "postinstall": "prisma generate",
+    "postinstall": "node scripts/prisma-generate.js",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "import:legacy": "tsx scripts/import-legacy-jobs.ts"
+    "import:legacy": "tsx scripts/import-legacy-jobs.ts",
+    "db:push:prod": "prisma db push --schema prisma/schema.postgres.prisma",
+    "db:seed:prod": "tsx scripts/seed-research-programs.ts && tsx scripts/seed-scholarships.ts && tsx scripts/import-github-internships.ts",
+    "vercel-build": "prisma generate --schema prisma/schema.postgres.prisma && next build"
   },
   "dependencies": {
     "@google/generative-ai": "^0.17.1",

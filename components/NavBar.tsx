@@ -77,7 +77,7 @@ export default function NavBar() {
       <div className="mx-auto max-w-[1200px] px-5 sm:px-8 h-16 flex items-center gap-6">
         <Link href="/board" className="shrink-0 flex items-center gap-2.5 group">
           <Logo size={30} className="transition-transform duration-200 group-hover:scale-[1.04]" />
-          <span className="font-display font-bold tracking-tight text-[15px] text-ink">
+          <span className="font-display font-bold tracking-tight text-[16px] text-ink">
             Radar<span className="text-accent">.</span>
           </span>
         </Link>
@@ -91,8 +91,8 @@ export default function NavBar() {
                 className={clsx(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold whitespace-nowrap transition-colors duration-200",
                   active
-                    ? "bg-white/[0.06] text-ink"
-                    : "text-inkFaint hover:text-ink hover:bg-white/[0.04]"
+                    ? "bg-accent/[0.08] text-ink"
+                    : "text-inkFaint hover:text-ink hover:bg-accent/[0.05]"
                 )}
               >
                 <Icon size={14} className={active ? "text-accent" : undefined} />
@@ -107,7 +107,7 @@ export default function NavBar() {
             <>
               <Link
                 href="/login"
-                className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-inkFaint hover:text-ink hover:bg-white/[0.04] transition-colors duration-200"
+                className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-inkFaint hover:text-ink hover:bg-accent/[0.05] transition-colors duration-200"
               >
                 Sign in
               </Link>
@@ -130,7 +130,7 @@ export default function NavBar() {
               <button
                 onClick={handleSignOut}
                 title="Sign out"
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-inkFaint hover:text-ink hover:bg-white/[0.04] transition-colors duration-200"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-inkFaint hover:text-ink hover:bg-accent/[0.05] transition-colors duration-200"
               >
                 <LogOut size={13} />
                 Sign out

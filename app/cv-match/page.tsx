@@ -268,7 +268,7 @@ export default function CvMatchPage() {
           </p>
 
           {suggestProfile && (
-            <div className="mb-4 rounded-lg border border-hairline bg-white/[0.02] px-3 py-2.5">
+            <div className="mb-4 rounded-lg border border-hairline bg-accent/[0.03] px-3 py-2.5">
               <p className="text-xs font-bold text-ink mb-1.5">
                 Candidate profile{' '}
                 {suggestProfile.experience_level && (
@@ -312,7 +312,7 @@ export default function CvMatchPage() {
               {suggestions.map((s, i) => (
                 <li
                   key={s.id}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-hairline bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-hairline bg-accent/[0.03] hover:bg-accent/[0.05] transition-colors"
                 >
                   <span className="font-mono text-xs text-inkFaint w-5 shrink-0 tabular-nums">{i + 1}</span>
                   <div className="flex-1 min-w-0">
@@ -387,7 +387,7 @@ export default function CvMatchPage() {
             )}
           </div>
           <div className="flex items-center gap-4 mb-4">
-            <div className={clsx("font-display font-black text-4xl", scoreColor(result.matchScore))}>
+            <div className={clsx("font-display font-black text-5xl", scoreColor(result.matchScore))}>
               {result.matchScore}%
             </div>
             <div>

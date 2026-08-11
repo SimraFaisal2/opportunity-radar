@@ -1,5 +1,5 @@
 // Radar brand mark — a custom SVG radar sweep: concentric range rings,
-// a violet gradient sweep wedge, and a bright blip. No stock icons.
+// a deadline-red sweep wedge, and a bright blip. No stock icons.
 export default function Logo({ size = 32, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
@@ -18,8 +18,8 @@ export default function Logo({ size = 32, className = "" }: { size?: number; cla
           <stop offset="1" stopColor="#0E0E14" />
         </linearGradient>
         <linearGradient id="radar-sweep" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#A78BFA" stopOpacity="0.55" />
-          <stop offset="1" stopColor="#A78BFA" stopOpacity="0" />
+          <stop offset="0" stopColor="#16A34A" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#16A34A" stopOpacity="0" />
         </linearGradient>
       </defs>
 
@@ -33,7 +33,7 @@ export default function Logo({ size = 32, className = "" }: { size?: number; cla
       {/* Sweep wedge (rotated ~ -35deg so the blip sits up-right) */}
       <g transform="rotate(-35 24 24)">
         <path d="M24 24 L37.5 14 A16 16 0 0 1 41 24 Z" fill="url(#radar-sweep)" />
-        <line x1="24" y1="24" x2="40" y2="24" stroke="#A78BFA" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="24" y1="24" x2="40" y2="24" stroke="#16A34A" strokeWidth="1.5" strokeLinecap="round" />
       </g>
 
       {/* Blip */}
@@ -41,7 +41,7 @@ export default function Logo({ size = 32, className = "" }: { size?: number; cla
       <circle cx="37.6" cy="10.6" r="5.5" stroke="#22D3EE" strokeOpacity="0.35" strokeWidth="1" />
 
       {/* Center */}
-      <circle cx="24" cy="24" r="2.2" fill="#C4B5FD" />
+      <circle cx="24" cy="24" r="2.2" fill="#22C55E" />
     </svg>
   );
 }

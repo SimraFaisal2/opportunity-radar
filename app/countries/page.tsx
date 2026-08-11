@@ -89,7 +89,7 @@ export default function CountriesPage() {
               <div className="flex items-center gap-3 mb-3">
                 <CountryFlag name={c.name} className="text-4xl" />
                 <div className="min-w-0">
-                  <p className="font-display font-extrabold text-ink text-base truncate">{c.name}</p>
+                  <p className="font-bold text-ink text-base truncate">{c.name}</p>
                 </div>
                 <span className="ml-auto bg-accent text-[#0A0A0A] text-sm font-bold rounded-lg px-2.5 py-1">
                   {c.total}

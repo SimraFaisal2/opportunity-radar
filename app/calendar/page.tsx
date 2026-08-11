@@ -186,11 +186,11 @@ export default function CalendarPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setMonth((m) => subMonths(m, 1))} className="p-1.5 rounded-lg border border-hairline text-inkFaint hover:text-ink hover:bg-white/5 transition-colors">
+          <button onClick={() => setMonth((m) => subMonths(m, 1))} className="p-1.5 rounded-lg border border-hairline text-inkFaint hover:text-ink hover:bg-accent/5 transition-colors">
             <ChevronLeft size={16} />
           </button>
-          <span className="font-display font-bold text-sm text-ink w-32 text-center">{format(month, "MMMM yyyy")}</span>
-          <button onClick={() => setMonth((m) => addMonths(m, 1))} className="p-1.5 rounded-lg border border-hairline text-inkFaint hover:text-ink hover:bg-white/5 transition-colors">
+          <span className="font-bold text-sm text-ink w-32 text-center">{format(month, "MMMM yyyy")}</span>
+          <button onClick={() => setMonth((m) => addMonths(m, 1))} className="p-1.5 rounded-lg border border-hairline text-inkFaint hover:text-ink hover:bg-accent/5 transition-colors">
             <ChevronRight size={16} />
           </button>
         </div>
@@ -198,13 +198,13 @@ export default function CalendarPage() {
 
       <div className="flex items-center gap-4 mb-4 text-xs text-inkDim font-bold">
         <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-sun inline-block" /> Deadline</span>
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-white/25 inline-block" /> Applied date</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-black/25 inline-block" /> Applied date</span>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_320px] gap-5 items-start">
         <div className="grid grid-cols-7 gap-px bg-hairline/50 rounded-xl overflow-hidden border border-hairline">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-            <div key={d} className="bg-white/[0.03] text-center text-xs text-inkDim py-2 font-bold">{d}</div>
+            <div key={d} className="bg-accent/[0.04] text-center text-xs text-inkDim py-2 font-bold">{d}</div>
           ))}
           {days.map((day) => {
             const key = format(day, "yyyy-MM-dd");
@@ -216,7 +216,7 @@ export default function CalendarPage() {
                 key={key}
                 onClick={() => setSelectedDate(day)}
                 className={clsx(
-                  "bg-[#0E0E0E] min-h-[92px] p-1.5 cursor-pointer hover:bg-white/[0.04] transition-colors",
+                  "bg-white min-h-[92px] p-1.5 cursor-pointer hover:bg-accent/[0.05] transition-colors",
                   !inMonth && "opacity-40"
                 )}
               >
@@ -234,10 +234,10 @@ export default function CalendarPage() {
                           "w-full text-left text-[10px] rounded-md px-1 py-0.5 truncate text-ink hover:border-accent flex items-center gap-1 transition-colors",
                           ev.isOpportunity
                             ? "bg-sunSoft border border-sun/40 hover:border-sun"
-                            : "bg-white/[0.04] border border-hairline hover:border-accent"
+                            : "bg-accent/[0.04] border border-hairline hover:border-accent"
                         )}
                       >
-                        <span className={clsx("w-1.5 h-1.5 rounded-full shrink-0", hasDeadline ? "bg-sun" : "bg-white/25")} />
+                        <span className={clsx("w-1.5 h-1.5 rounded-full shrink-0", hasDeadline ? "bg-sun" : "bg-black/25")} />
                         <span className="truncate">{ev.company}</span>
                       </button>
                     );
@@ -253,7 +253,7 @@ export default function CalendarPage() {
 
         {/* Due soonest panel */}
         <div className="card p-5 sticky top-24">
-          <h2 className="font-display font-bold text-ink mb-0.5 flex items-center gap-1.5">
+          <h2 className="font-display font-bold text-lg text-ink mb-0.5 flex items-center gap-1.5">
             <AlertTriangle size={16} className="text-sun" /> Due soonest
           </h2>
           <p className="text-xs text-inkDim font-bold mb-3">Next 6 deadlines from today, {format(new Date(), "MMM d, yyyy")}</p>
@@ -267,7 +267,7 @@ export default function CalendarPage() {
                 <button
                   key={ev.id}
                   onClick={() => setSelectedEvent(ev)}
-                  className="w-full text-left bg-white/[0.03] border border-hairline hover:border-sun/50 rounded-lg px-3 py-2 transition-colors duration-200"
+                  className="w-full text-left bg-accent/[0.04] border border-hairline hover:border-sun/50 rounded-lg px-3 py-2 transition-colors duration-200"
                 >
                   <div className="flex items-center justify-between gap-2 mb-0.5">
                     <span className="text-sm font-extrabold text-ink truncate">{ev.company}</span>
@@ -291,10 +291,10 @@ export default function CalendarPage() {
 
       {/* Quick-add modal */}
       {selectedDate && !selectedEvent && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-30 p-4" onClick={() => setSelectedDate(null)}>
-          <div className="bg-[#121212] border border-hairline rounded-xl p-5 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/35 backdrop-blur-sm flex items-center justify-center z-30 p-4" onClick={() => setSelectedDate(null)}>
+          <div className="bg-white border border-hairline shadow-2xl rounded-xl p-5 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display font-bold text-ink">Quick-add · {format(selectedDate, "MMM d, yyyy")}</h2>
+              <h2 className="font-display font-bold text-lg text-ink">Quick-add · {format(selectedDate, "MMM d, yyyy")}</h2>
               <button onClick={() => setSelectedDate(null)} className="text-inkDim hover:text-ink"><X size={16} /></button>
             </div>
             <div className="space-y-2">
@@ -302,19 +302,19 @@ export default function CalendarPage() {
                 placeholder="Company"
                 value={quickAdd.company}
                 onChange={(e) => setQuickAdd({ ...quickAdd, company: e.target.value })}
-                className="w-full bg-[#0E0E0E] border border-hairline rounded-lg px-3 py-2 text-sm text-ink placeholder:text-inkFaint focus:border-accent/70 outline-none transition-colors"
+                className="w-full bg-white border border-hairline rounded-lg px-3 py-2 text-sm text-ink placeholder:text-inkFaint focus:border-accent/70 outline-none transition-colors"
               />
               <input
                 placeholder="Role"
                 value={quickAdd.role}
                 onChange={(e) => setQuickAdd({ ...quickAdd, role: e.target.value })}
-                className="w-full bg-[#0E0E0E] border border-hairline rounded-lg px-3 py-2 text-sm text-ink placeholder:text-inkFaint focus:border-accent/70 outline-none transition-colors"
+                className="w-full bg-white border border-hairline rounded-lg px-3 py-2 text-sm text-ink placeholder:text-inkFaint focus:border-accent/70 outline-none transition-colors"
               />
               <input
                 placeholder="Job link (optional)"
                 value={quickAdd.jobLink}
                 onChange={(e) => setQuickAdd({ ...quickAdd, jobLink: e.target.value })}
-                className="w-full bg-[#0E0E0E] border border-hairline rounded-lg px-3 py-2 text-sm text-ink placeholder:text-inkFaint focus:border-accent/70 outline-none transition-colors"
+                className="w-full bg-white border border-hairline rounded-lg px-3 py-2 text-sm text-ink placeholder:text-inkFaint focus:border-accent/70 outline-none transition-colors"
               />
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-1.5 text-sm text-inkDim font-bold shrink-0">
@@ -324,7 +324,7 @@ export default function CalendarPage() {
                   type="date"
                   value={quickAdd.deadline}
                   onChange={(e) => setQuickAdd({ ...quickAdd, deadline: e.target.value })}
-                  className="w-full bg-[#0E0E0E] border border-hairline rounded-lg px-3 py-2 text-sm text-ink focus:border-accent/70 outline-none transition-colors"
+                  className="w-full bg-white border border-hairline rounded-lg px-3 py-2 text-sm text-ink focus:border-accent/70 outline-none transition-colors"
                 />
               </div>
             </div>
@@ -341,10 +341,10 @@ export default function CalendarPage() {
 
       {/* Event detail modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-30 p-4" onClick={() => { setSelectedEvent(null); setSelectedDate(null); }}>
-          <div className="bg-[#121212] border border-hairline rounded-xl p-5 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/35 backdrop-blur-sm flex items-center justify-center z-30 p-4" onClick={() => { setSelectedEvent(null); setSelectedDate(null); }}>
+          <div className="bg-white border border-hairline shadow-2xl rounded-xl p-5 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display font-bold text-ink">{selectedEvent.company}</h2>
+              <h2 className="font-display font-bold text-lg text-ink">{selectedEvent.company}</h2>
               <button onClick={() => { setSelectedEvent(null); setSelectedDate(null); }} className="text-inkDim hover:text-ink"><X size={16} /></button>
             </div>
             <p className="text-sm text-inkDim mb-1">{selectedEvent.role}</p>
@@ -368,7 +368,7 @@ export default function CalendarPage() {
                 href={selectedEvent.jobLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-sm font-bold text-sky hover:text-[#7DD3FC] hover:underline transition-colors"
+                className="flex items-center gap-1.5 text-sm font-bold text-sky hover:text-[#0369A1] hover:underline transition-colors"
               >
                 {selectedEvent.isOpportunity ? "Open apply link" : "Open job link"} <ExternalLink size={13} />
               </a>

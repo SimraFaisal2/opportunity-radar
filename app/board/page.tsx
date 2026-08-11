@@ -53,12 +53,12 @@ const DEGREE_FILTERS: { key: Degree; label: string }[] = [
 // Shared column template for the radar list header + rows (md+). Both sides
 // use the exact same track widths, so header labels stay glued to the data
 // beneath them. Tracks: # · Role · Location · Deadline · Freshness · Actions.
-const LIST_GRID = "grid-cols-[2rem_minmax(0,1fr)_8.5rem_6.5rem_7rem_11rem]";
+const LIST_GRID = "grid-cols-[2rem_minmax(0,1fr)_8rem_6.5rem_6.5rem_10.5rem]";
 
 // One dark surface system for the whole board; templates only re-skin the
 // accent (buttons, chips, row edges, glow) — never the surfaces.
 const SURFACE = {
-  panel: "bg-[#101010] border border-hairline rounded-lg",
+  panel: "bg-white border border-hairline rounded-lg",
   chipIdle: "bg-transparent border border-hairline text-inkDim hover:text-ink hover:border-hairlineStrong",
   mutedIdle: "text-inkFaint hover:text-ink",
   head: "text-ink",
@@ -69,10 +69,10 @@ const SURFACE = {
   border: "border-hairline",
   tracked: "border-leaf/40 bg-leafSoft text-leaf",
   trackBtn: "btn-ghost !px-2.5 !py-1 !text-xs",
-  degree: "text-inkDim bg-white/[0.05] border-hairline",
-  eligBox: "bg-white/[0.03] border border-hairline text-inkDim",
-  row: "border-b border-hairline/60 hover:bg-white/[0.03]",
-  cardHover: "hover:border-white/15 hover:bg-surfaceHover",
+  degree: "text-inkDim bg-accent/[0.06] border-hairline",
+  eligBox: "bg-accent/[0.04] border border-hairline text-inkDim",
+  row: "border-b border-hairline/60 hover:bg-accent/[0.05]",
+  cardHover: "hover:border-accent/25 hover:bg-surfaceHover",
 };
 
 // Template themes: each one accents the same dark board differently.
@@ -100,20 +100,20 @@ const TEMPLATES: Record<
     rowAccent: "border-l-accent",
     link: "text-accent hover:text-accentBright",
     accentText: "text-accent",
-    glow: "radial-gradient(58% 55% at 50% 0%, rgba(167,139,250,0.13) 0%, rgba(167,139,250,0.04) 45%, transparent 75%)",
+    glow: "radial-gradient(58% 55% at 50% 0%, rgba(22,163,74,0.12) 0%, rgba(22,163,74,0.04) 45%, transparent 75%)",
     pillRing: "",
   },
   cs: {
     label: "CS",
     icon: Code2,
     kicker: "Terminal view — software, systems & data-science roles, accented in cyan.",
-    btn: "bg-sky text-[#04141F] shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_1px_3px_rgba(0,0,0,0.5)] hover:bg-[#7DD3FC]",
-    chip: "bg-sky/15 text-sky border-sky/50",
-    rowAccent: "border-l-sky",
-    link: "text-sky hover:text-[#7DD3FC]",
-    accentText: "text-sky",
-    glow: "radial-gradient(58% 55% at 50% 0%, rgba(56,189,248,0.12) 0%, rgba(56,189,248,0.04) 45%, transparent 75%)",
-    pillRing: "ring-1 ring-sky/30",
+    btn: "bg-mint text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_3px_rgba(0,0,0,0.25)] hover:bg-mintBright",
+    chip: "bg-mintSoft text-mint border-mint/40",
+    rowAccent: "border-l-mint",
+    link: "text-mint hover:text-mintBright",
+    accentText: "text-mint",
+    glow: "radial-gradient(58% 55% at 50% 0%, rgba(15,118,110,0.12) 0%, rgba(15,118,110,0.04) 45%, transparent 75%)",
+    pillRing: "ring-1 ring-mint/30",
   },
   engineering: {
     label: "Engineering",
@@ -132,9 +132,9 @@ const TEMPLATES: Record<
     icon: Sparkles,
     kicker: "Leonardo-style — violet → magenta → cyan gradients with a soft glow.",
     btn: "bg-gradient-to-r from-accent via-[#E879F9] to-[#22D3EE] text-[#0A0A0A] shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_1px_4px_rgba(167,139,250,0.35)] hover:brightness-110",
-    chip: "bg-gradient-to-r from-accent/20 via-[#E879F9]/20 to-[#22D3EE]/20 text-accentBright border-[#E879F9]/40",
+    chip: "bg-gradient-to-r from-accent/20 via-[#E879F9]/20 to-[#22D3EE]/20 text-accentDim border-[#E879F9]/40",
     rowAccent: "border-l-[#C084FC]",
-    link: "text-accentBright hover:text-white",
+    link: "text-accentBright hover:text-accent",
     accentText: "text-transparent bg-clip-text bg-gradient-to-r from-accent via-[#E879F9] to-[#22D3EE]",
     glow: "radial-gradient(50% 55% at 28% 0%, rgba(167,139,250,0.18) 0%, transparent 62%), radial-gradient(50% 55% at 72% 0%, rgba(232,121,249,0.15) 0%, transparent 62%), radial-gradient(45% 45% at 50% 105%, rgba(34,211,238,0.08) 0%, transparent 60%)",
     pillRing: "ring-1 ring-[#E879F9]/30",
@@ -145,14 +145,31 @@ export default function BoardPage() {
   const [items, setItems] = useState<Opportunity[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [countries, setCountries] = useState<string[]>([]);
-  const [type, setType] = useState<OppType>("ALL");
+  // Lazy-init from the URL so the assistant's quick actions can deep-link to
+  // a filtered view (same pattern as the ?country= deep-link below).
+  const [type, setType] = useState<OppType>(() => {
+    if (typeof window === "undefined") return "ALL";
+    const t = new URLSearchParams(window.location.search).get("type");
+    return (TYPE_FILTERS.some((f) => f.key === t) ? t : "ALL") as OppType;
+  });
   // Research tab defaults to institute programs — corporate R&D (TikTok,
   // quant firms…) only appears if you explicitly pick "Company R&D"/"All".
   const [sponsor, setSponsor] = useState<SponsorFilter>("ACADEMIC");
-  const [degree, setDegree] = useState<Degree>("ALL");
-  const [field, setField] = useState<string>("ALL");
+  const [degree, setDegree] = useState<Degree>(() => {
+    if (typeof window === "undefined") return "ALL";
+    const d = new URLSearchParams(window.location.search).get("degree");
+    return (DEGREE_FILTERS.some((f) => f.key === d) ? d : "ALL") as Degree;
+  });
+  const [field, setField] = useState<string>(() => {
+    if (typeof window === "undefined") return "ALL";
+    const f = new URLSearchParams(window.location.search).get("field");
+    return FIELDS.some((x) => x.key === f) ? (f as string) : "ALL";
+  });
   const [layout, setLayout] = useState<Layout>("list");
   const [template, setTemplate] = useState<TemplateKey>("all");
+  // Live clock — ticks once a minute so the deadline countdown pills visibly
+  // count down without hammering the renderer.
+  const [now, setNow] = useState(() => Date.now());
   // Lazy-init from the URL so a ?country= deep-link (Countries page) filters
   // the very first load instead of flashing all rows then re-fetching.
   const [country, setCountry] = useState(() => {
@@ -169,6 +186,22 @@ export default function BoardPage() {
   const [loading, setLoading] = useState(true);
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
   const [trackingId, setTrackingId] = useState<string | null>(null);
+  // Per-internship "applied" state — persisted so every Apply Now click marks
+  // THAT listing (not a global quest flag). One set per opportunity id.
+  const [applied, setApplied] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try { return new Set(JSON.parse(localStorage.getItem("radar-applied") ?? "[]")); } catch { return new Set(); }
+  });
+
+  function markApplied(id: string) {
+    setApplied((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem("radar-applied", JSON.stringify([...next])); } catch { /* noop */ }
+      return next;
+    });
+  }
 
   const T = TEMPLATES[template];
 
@@ -229,6 +262,12 @@ export default function BoardPage() {
     return () => clearTimeout(t);
   }, [type, degree, country, q, field, sponsor]);
 
+  // Countdown clock ticker.
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
+
   // When leaving the Research tab, clear the sponsor filter so it can't leak
   // into the Internships/Scholarships views.
   useEffect(() => {
@@ -269,7 +308,7 @@ export default function BoardPage() {
     if (op.type === "SCHOLARSHIP") return { label: "Scholarship", cls: "text-sun bg-sunSoft border-sun/30" };
     if (op.type === "RESEARCH_INTERNSHIP") return { label: "Research", cls: "text-grape bg-grapeSoft border-grape/30" };
     if (op.type === "INTERNSHIP") return { label: "Internship", cls: "text-sky bg-skySoft border-sky/30" };
-    return { label: "Opportunity", cls: "text-inkDim bg-white/[0.05] border-hairline" };
+    return { label: "Opportunity", cls: "text-inkDim bg-accent/[0.06] border-hairline" };
   };
 
   const fieldMeta = (op: Opportunity) => FIELD_BY_KEY[(op.field as FieldKey) || "OTHER"] ?? FIELD_BY_KEY.OTHER;
@@ -279,10 +318,25 @@ export default function BoardPage() {
     return first || "Global";
   };
 
+  // The API can return the same posting twice (feed duplicates) — render one
+  // row per company+title, keeping the first (newest) occurrence. Both list
+  // and grid go through this, so nothing is just visually hidden.
+  const dedupedItems = useMemo(() => {
+    const seen = new Set<string>();
+    const out: Opportunity[] = [];
+    for (const op of items) {
+      const k = `${op.company}|${op.title}`.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(op);
+    }
+    return out;
+  }, [items]);
+
   // Client-side deadline sort (the API returns soonest-first by default, so
   // asc mirrors it; desc reverses). Null-deadline rows always sink last.
   const sortedItems = useMemo(() => {
-    return [...items].sort((a, b) => {
+    return [...dedupedItems].sort((a, b) => {
       const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
       const db = b.deadline ? new Date(b.deadline).getTime() : Infinity;
       return deadlineSort === "asc" ? da - db : db - da;
@@ -317,7 +371,33 @@ export default function BoardPage() {
   const freshnessDot = (fr: { dot: string }) => {
     if (fr.dot === "bg-leaf") return "bg-leaf";
     if (fr.dot === "bg-sky") return "bg-sky";
-    return "bg-white/25";
+    return "bg-black/25";
+  };
+
+  // Live deadline countdown — days until the deadline, colored by urgency.
+  // Warm hues (amber/coral) signal pressure against the cool green base;
+  // the existing "Due dd/mm/yyyy" string is left untouched next to it.
+  const daysUntil = (deadline: string | null) => {
+    if (!deadline) return null;
+    return Math.ceil((new Date(deadline).getTime() - now) / 86400000);
+  };
+
+  const deadlinePill = (op: Opportunity) => {
+    const d = daysUntil(op.deadline);
+    if (d === null) return null;
+    const cls = d < 0
+      ? "bg-coralSoft text-coral border-coral/40"
+      : d <= 7
+        ? "bg-sunSoft text-sun border-sun/40"
+        : d <= 30
+          ? "bg-accent/[0.08] text-accent border-accent/30"
+          : "bg-transparent text-inkFaint border-hairline";
+    const label = d < 0 ? `${-d}d overdue` : d === 0 ? "due today" : `${d}d left`;
+    return (
+      <span className={clsx("font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 tabular-nums", cls)}>
+        {label}
+      </span>
+    );
   };
 
   const renderFieldPill = (op: Opportunity) => {
@@ -329,22 +409,30 @@ export default function BoardPage() {
     );
   };
 
-  const renderActions = (op: Opportunity) => (
+  const renderActions = (op: Opportunity) => {
+    const isApplied = applied.has(op.id);
+    return (
     <div className="flex items-center gap-2.5 shrink-0">
       <a
         href={op.applyUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className={clsx("flex items-center gap-1 text-xs font-bold transition-colors", T.link)}
+        onClick={() => markApplied(op.id)}
+        className={clsx(
+          "flex items-center gap-1 text-xs font-bold rounded-lg transition-all duration-200",
+          isApplied
+            ? "px-2.5 py-1 border bg-leafSoft text-leaf border-leaf/40"
+            : T.link
+        )}
       >
-        Apply Now <ExternalLink size={11} />
+        {isApplied ? (<><Check size={11} /> Applied</>) : (<>Apply Now <ExternalLink size={11} /></>)}
       </a>
       <button
         onClick={() => handleTrack(op.id)}
         disabled={!!op.application || trackingId === op.id}
         className={clsx(
           op.application
-            ? clsx("flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg border cursor-default", SURFACE.tracked)
+            ? clsx("flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg border cursor-default pop-in", SURFACE.tracked)
             : clsx("px-2.5 py-1 text-xs", SURFACE.trackBtn)
         )}
       >
@@ -352,19 +440,22 @@ export default function BoardPage() {
         {op.application ? "Tracked" : "Track"}
       </button>
     </div>
-  );
+    );
+  };
 
   // Radar-style list row: rank, role stack, tags, location, deadline, freshness.
   const renderRow = (op: Opportunity, idx: number) => {
     const kind = kindBadge(op);
     const fr = freshnessLabel(op.publishedAt);
-    const showElig = op.eligibility && (op.type === "RESEARCH_INTERNSHIP" || op.type === "INTERNSHIP");
+    // Every listing with eligibility text gets the toggle — scholarships and
+    // summer schools have it in the data too, they just weren't shown before.
+    const showElig = !!op.eligibility;
     const expanded = expandedElig === op.id;
     return (
       <div
         key={op.id}
         className={clsx(
-          "border-l-2 flex flex-col md:grid items-stretch md:items-center gap-2 md:gap-5 px-4 py-3",
+          "border-l-2 flex flex-col md:grid items-stretch md:items-start gap-2 md:gap-5 px-4 py-3",
           SURFACE.row,
           T.rowAccent,
           LIST_GRID
@@ -372,27 +463,30 @@ export default function BoardPage() {
       >
         <span className={clsx("font-mono text-[11px] w-8 shrink-0 tabular-nums", SURFACE.muted)}>{idx + 1}</span>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={clsx("font-display font-semibold text-sm truncate", SURFACE.company)}>{op.company}</span>
+          {/* Tags stay on ONE line on desktop so every row's title sits at the
+              same height — a wrap would push the title down and float the
+              right-hand columns (they're pinned to the title line). */}
+          <div className="flex items-center gap-1.5 flex-wrap md:flex-nowrap md:overflow-hidden">
+            <span className={clsx("font-bold text-sm truncate", SURFACE.company)}>{op.company}</span>
             {renderFieldPill(op)}
-            <span className={clsx("text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0", kind.cls)}>
+            <span className={clsx("text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full border shrink-0", kind.cls)}>
               {kind.label}
             </span>
             {op.type === "RESEARCH_INTERNSHIP" && !op.summerSchool && (
               <span
                 title={SPONSOR_META[op.sponsor].label}
-                className={clsx("text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0", SPONSOR_META[op.sponsor].badge)}
+                className={clsx("text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full border shrink-0", SPONSOR_META[op.sponsor].badge)}
               >
                 {SPONSOR_META[op.sponsor].short}
               </span>
             )}
             {op.summerSchool && (
-              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 text-sun bg-sunSoft border-sun/30">
+              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full border shrink-0 text-sun bg-sunSoft border-sun/30">
                 Summer school
               </span>
             )}
             {op.degree !== "ANY" && (
-              <span className={clsx("text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0", SURFACE.degree)}>
+              <span className={clsx("text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full border shrink-0", SURFACE.degree)}>
                 {op.degree}
               </span>
             )}
@@ -408,7 +502,7 @@ export default function BoardPage() {
                 Who can apply?
               </button>
               {expanded && (
-                <p className={clsx("mt-1.5 text-xs leading-relaxed rounded-lg px-3 py-2.5", SURFACE.eligBox)}>
+                <p className={clsx("card-in mt-1.5 text-xs leading-relaxed rounded-lg px-3 py-2.5", SURFACE.eligBox)}>
                   {op.eligibility}
                 </p>
               )}
@@ -428,20 +522,21 @@ export default function BoardPage() {
           </span>
         </div>
         {/* Desktop columns — each sits in its own grid track, matching the header. */}
-        <div className={clsx("hidden md:flex items-center gap-1 min-w-0 text-xs font-mono", SURFACE.muted)}>
+        <div className={clsx("hidden md:flex items-center gap-1 min-w-0 text-xs font-mono md:pt-[21px]", SURFACE.muted)}>
           <CountryFlag name={primaryCountry(op)} className="shrink-0" />
           <span className="truncate min-w-0">{op.countries}</span>
         </div>
-        <div className={clsx("hidden md:block text-xs font-mono tabular-nums min-w-0", SURFACE.muted)}>
-          {op.deadline ? `Due ${new Date(op.deadline).toLocaleDateString()}` : "Undated"}
+        <div className={clsx("hidden md:flex flex-col items-start gap-1 text-xs font-mono tabular-nums min-w-0 md:pt-[21px]", SURFACE.muted)}>
+          <span>{op.deadline ? `Due ${new Date(op.deadline).toLocaleDateString()}` : "Undated"}</span>
+          {deadlinePill(op)}
         </div>
-        <div className={clsx("hidden md:flex items-center gap-1.5 min-w-0", freshnessTone(fr))}>
+        <div className={clsx("hidden md:flex items-center gap-1.5 min-w-0 md:pt-[21px]", freshnessTone(fr))}>
           <span className={clsx("w-1.5 h-1.5 rounded-full shrink-0", freshnessDot(fr))} />
           <span className="text-xs font-mono truncate">{fr.label}</span>
         </div>
-        {/* Actions — left-aligned on md+ (header starts where Apply Now
-            starts); on mobile it stays a full-width row after the info line. */}
-        <div className="flex justify-start min-w-0">
+        {/* Actions — pinned to the title line on md+ (header starts where
+            Apply Now starts); on mobile it stays a full-width row. */}
+        <div className="flex justify-start min-w-0 md:pt-[21px]">
           {renderActions(op)}
         </div>
       </div>
@@ -452,12 +547,12 @@ export default function BoardPage() {
   const renderCard = (op: Opportunity) => {
     const kind = kindBadge(op);
     const fr = freshnessLabel(op.publishedAt);
-    const showElig = op.eligibility && (op.type === "RESEARCH_INTERNSHIP" || op.type === "INTERNSHIP");
+    const showElig = !!op.eligibility;
     const expanded = expandedElig === op.id;
     return (
-      <div key={op.id} className={clsx("p-4 flex flex-col card", SURFACE.cardHover)}>
+      <div key={op.id}        className={clsx("p-4 flex flex-col card group", SURFACE.cardHover)}>
         <div className="flex items-center justify-between mb-1.5 gap-2">
-          <span className={clsx("font-display font-semibold text-sm truncate", SURFACE.company)}>{op.company}</span>
+          <span className={clsx("font-bold text-sm truncate", SURFACE.company)}>{op.company}</span>
           <span className={clsx("text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shrink-0", kind.cls)}>
             {kind.label}
           </span>
@@ -491,19 +586,24 @@ export default function BoardPage() {
           <span className={clsx("flex items-center gap-1.5 font-bold", freshnessTone(fr))}>
             <span className={clsx("w-1.5 h-1.5 rounded-full", freshnessDot(fr))} /> {fr.label}
           </span>
+          {deadlinePill(op) && (
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              {deadlinePill(op)}
+            </span>
+          )}
         </div>
 
         {showElig && (
           <div className="mb-3">
             <button
-              onClick={() => setExpandedElig(expanded ? null : op.id)}
+              onClick={(e) => { e.stopPropagation(); setExpandedElig(expanded ? null : op.id); }}
               className={clsx("flex items-center gap-1 text-xs font-bold hover:underline transition-colors", T.link)}
             >
               {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
               Who can apply?
             </button>
             {expanded && (
-              <p className={clsx("mt-1.5 text-xs leading-relaxed rounded-lg px-3 py-2.5", SURFACE.eligBox)}>
+              <p className={clsx("card-in mt-1.5 text-xs leading-relaxed rounded-lg px-3 py-2.5", SURFACE.eligBox)}>
                 {op.eligibility}
               </p>
             )}
@@ -529,34 +629,33 @@ export default function BoardPage() {
 
   return (
     <div className="relative">
-      {/* Hero glow */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-28 h-[460px]" style={{ background: T.glow }} />
-
       <div className="relative">
         {/* Hero */}
         <div className="mb-10">
           <p className={clsx("font-mono text-[11px] tracking-[0.22em] uppercase font-medium mb-3", T.link)}>
             Opportunity radar
           </p>
-          <h1 className="font-display font-bold text-4xl sm:text-5xl tracking-[-0.03em] text-ink leading-[1.05] mb-4">
+          <h1 className="font-display font-extrabold text-4xl sm:text-5xl tracking-[-0.01em] text-ink leading-[1.08] mb-4">
             Live opportunities,
             <br />
             ranked <span className={T.accentText}>fresh</span>.
           </h1>
           <p className={clsx("text-[15px] max-w-xl leading-relaxed", SURFACE.sub)}>{T.kicker}</p>
-          <div className="flex items-center gap-3 mt-6 flex-wrap">
-            <span className="font-mono text-xs text-ink bg-white/[0.05] border border-hairline rounded-lg px-3 py-1.5 tabular-nums">
-              {totalCount} live listings
-            </span>
-            <span className="font-mono text-xs text-ink bg-white/[0.05] border border-hairline rounded-lg px-3 py-1.5 tabular-nums">
-              {countries.length} countries
-            </span>
-            <span className="font-mono text-xs text-inkDim px-1">newest first · deadlines counted down</span>
+          <div className="flex items-stretch gap-3 mt-6 flex-wrap">
+            <div className="flex items-baseline gap-2.5 bg-accent/[0.06] border border-hairline rounded-xl px-4 py-3">
+              <span className="font-display font-bold text-3xl leading-none tabular-nums text-ink">{totalCount}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-inkDim">live listings</span>
+            </div>
+            <div className="flex items-baseline gap-2.5 bg-accent/[0.06] border border-hairline rounded-xl px-4 py-3">
+              <span className="font-display font-bold text-3xl leading-none tabular-nums text-ink">{countries.length}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-inkDim">countries</span>
+            </div>
+            <span className="flex items-center font-mono text-xs text-inkDim px-1">newest first · deadlines counted down</span>
           </div>
         </div>
 
-        {/* Template switcher + sync */}
-        <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
+        {/* Template switcher + sync — separated from the hero like a section break */}
+        <div className="flex items-center justify-between mb-5 gap-3 flex-wrap border-t border-hairline pt-5">
           <div className={clsx("inline-flex rounded-lg p-1 gap-0.5", SURFACE.panel)}>
             {(Object.keys(TEMPLATES) as TemplateKey[]).map((k) => {
               const Icon = TEMPLATES[k].icon;
@@ -746,7 +845,7 @@ export default function BoardPage() {
               <section key={pc}>
                 <div className="flex items-center gap-2 mb-3">
                   <CountryFlag name={pc} className="text-xl" />
-                  <h2 className={clsx("font-display font-bold text-lg tracking-tight", SURFACE.head)}>{pc}</h2>
+                  <h2 className={clsx("font-display font-bold text-xl tracking-tight", SURFACE.head)}>{pc}</h2>
                   <span className={clsx("text-xs font-semibold rounded-full px-2.5 py-0.5 border", SURFACE.muted, SURFACE.panel)}>
                     {ops.length} {ops.length === 1 ? "listing" : "listings"}
                   </span>
@@ -760,7 +859,7 @@ export default function BoardPage() {
                 )}
               </section>
             ))}
-            {!loading && items.length === 0 && (
+            {!loading && dedupedItems.length === 0 && (
               <p className={clsx("text-sm text-center py-12", SURFACE.muted)}>{emptyMsg}</p>
             )}
           </div>
@@ -770,7 +869,7 @@ export default function BoardPage() {
                 the rows below so every label sits directly above its data. */}
             <div
               className={clsx(
-                "hidden md:grid items-center gap-5 px-4 py-3 text-xs font-semibold tracking-[0.12em] bg-white/[0.03] border-b border-hairline",
+                "hidden md:grid items-center gap-5 px-4 py-3 text-xs font-semibold tracking-[0.12em] bg-accent/[0.04] border-b border-hairline",
                 "text-inkFaint",
                 LIST_GRID
               )}
@@ -801,7 +900,7 @@ export default function BoardPage() {
               <span>Actions</span>
             </div>
             {sortedItems.map((op, i) => renderRow(op, i))}
-            {!loading && items.length === 0 && (
+            {!loading && dedupedItems.length === 0 && (
               <div className="py-16 text-center">
                 <p className={clsx("text-sm", SURFACE.muted)}>{emptyMsg}</p>
               </div>
@@ -810,9 +909,9 @@ export default function BoardPage() {
         ) : (
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-              {items.map(renderCard)}
+              {dedupedItems.map(renderCard)}
             </div>
-            {!loading && items.length === 0 && (
+            {!loading && dedupedItems.length === 0 && (
               <p className={clsx("text-sm text-center py-12", SURFACE.muted)}>{emptyMsg}</p>
             )}
           </div>

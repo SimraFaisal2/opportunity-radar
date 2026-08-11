@@ -11,23 +11,23 @@ interface Analytics {
   timeline: { month: string; count: number }[];
 }
 
-// Status hues tuned for the dark surface.
+// Status hues tuned for the light surface.
 const STATUS_COLORS: Record<string, string> = {
-  APPLIED: "#8A8A93",
-  SCREENING: "#38BDF8",
-  INTERVIEW: "#FBBF24",
-  OFFER: "#4ADE80",
-  REJECTED: "#F87171",
+  APPLIED: "#6B7280",
+  SCREENING: "#0284C7",
+  INTERVIEW: "#D97706",
+  OFFER: "#16A34A",
+  REJECTED: "#DC2626",
 };
 
-const GRID_COLOR = "#262626";
+const GRID_COLOR = "#E5E7EB";
 
 const TOOLTIP_STYLE = {
-  background: "#141414",
-  border: "1px solid #2A2A2A",
+  background: "#FFFFFF",
+  border: "1px solid #E5E7EB",
   borderRadius: 10,
   fontSize: 12,
-  color: "#EDEDED",
+  color: "#17171B",
 };
 
 export default function AnalyticsPage() {
@@ -50,15 +50,15 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div className="card p-5">
           <div className="flex items-center gap-2 text-inkDim text-xs font-semibold mb-1"><Send size={13} /> Total applications</div>
-          <div className="font-display font-black text-3xl text-ink">{data.total}</div>
+          <div className="font-display font-black text-4xl text-ink">{data.total}</div>
         </div>
         <div className="card p-5">
           <div className="flex items-center gap-2 text-inkDim text-xs font-semibold mb-1"><Percent size={13} /> Interview conversion</div>
-          <div className="font-display font-black text-3xl text-leaf">{data.conversionRate}%</div>
+          <div className="font-display font-black text-4xl text-leaf">{data.conversionRate}%</div>
         </div>
         <div className="card p-5">
           <div className="flex items-center gap-2 text-inkDim text-xs font-semibold mb-1"><TrendingUp size={13} /> Offers</div>
-          <div className="font-display font-black text-3xl text-leaf">{data.byStatus.OFFER}</div>
+          <div className="font-display font-black text-4xl text-leaf">{data.byStatus.OFFER}</div>
         </div>
       </div>
 
@@ -102,7 +102,7 @@ export default function AnalyticsPage() {
               <XAxis dataKey="month" stroke="#8A8A93" fontSize={11} tickLine={false} axisLine={{ stroke: GRID_COLOR }} />
               <YAxis stroke="#8A8A93" fontSize={11} tickLine={false} axisLine={{ stroke: GRID_COLOR }} allowDecimals={false} />
               <Tooltip contentStyle={TOOLTIP_STYLE} />
-              <Line type="monotone" dataKey="count" stroke="#A78BFA" strokeWidth={3} dot={{ fill: "#A78BFA", r: 3 }} />
+              <Line type="monotone" dataKey="count" stroke="#16A34A" strokeWidth={3} dot={{ fill: "#16A34A", r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
           {data.timeline.length === 0 && (

@@ -3,42 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --font-display: var(--font-space);
-  --font-body: var(--font-hanken);
+  /* Headings and body share one family (Inter) — --font-display aliases the
+     body variable so next/font loads a single face for both. */
+  --font-display: var(--font-body);
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background: #0A0A0A;
-  color: #EDEDED;
+  background: #F4FAF6;
+  color: #17171B;
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Subtle film-grain noise over everything, like Leonardo AI. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
 ::selection {
-  background: rgba(167, 139, 250, 0.35);
-  color: #FFFFFF;
+  background: rgba(22, 163, 74, 0.22);
+  color: #17171B;
 }
 
-/* keyboard focus visibility */
+/* keyboard focus visibility — signal green */
 :focus-visible {
-  outline: 2px solid rgba(167, 139, 250, 0.8);
+  outline: 2px solid rgba(22, 163, 74, 0.8);
   outline-offset: 2px;
 }
 
@@ -49,18 +39,83 @@ body::before {
   }
 }
 
+/* Micro-interactions — quick and purposeful. The prefers-reduced-motion block
+   above flattens every one of these to its end state. */
+@keyframes popIn {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  70% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes cardIn {
+  from { transform: translateY(6px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.pop-in { animation: popIn 0.25s ease-out; }
+.card-in { animation: cardIn 0.22s ease-out; }
+
+/* Radar Buddy mascot — the antenna sways and its blip pulses; the eyes blink.
+   The reduced-motion block above freezes all of these to their end state. */
+.buddy-antenna {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: antennaSway 5.2s ease-in-out infinite;
+}
+@keyframes antennaSway {
+  0%, 86%, 100% { transform: rotate(0deg); }
+  90% { transform: rotate(-5deg); }
+  94% { transform: rotate(3deg); }
+}
+.buddy-blip {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blipPulse 2.2s ease-in-out infinite;
+}
+@keyframes blipPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  55% { transform: scale(1.45); opacity: 0.65; }
+}
+.assistant-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 4.2s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+/* Buddy hop + falling blips — the mini-game. Reduced-motion flattens both. */
+.buddy-hop {
+  animation: hop 0.32s ease-out;
+}
+@keyframes hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  35% { transform: translateY(-10px) scale(0.97, 1.06); }
+  65% { transform: translateY(0) scale(1.04, 0.96); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+.blip-fall {
+  animation-name: blipFall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes blipFall {
+  from { transform: translateY(0); }
+  to { transform: translateY(176px); }
+}
+
 @layer components {
   /* Primary action: solid accent fill with a subtle inner highlight, no hard
-     chunky bottom shadow. Dark text on the light violet for contrast. */
+     chunky bottom shadow. Dark text on the accent for contrast. */
   .duo-btn {
-    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 select-none disabled:opacity-50 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 select-none disabled:opacity-50;
   }
   .duo-btn-green {
     @apply bg-accent text-[#0A0A0A] shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_3px_rgba(0,0,0,0.5)] hover:bg-accentBright;
   }
   /* Ghost / secondary: hairline border that fills on hover. */
   .duo-btn-white {
-    @apply border border-hairline bg-transparent text-inkDim hover:text-ink hover:bg-white/5 hover:border-hairlineStrong;
+    @apply border border-hairline bg-transparent text-inkDim hover:text-ink hover:bg-accent/5 hover:border-hairlineStrong;
   }
   /* Surface card: border-only elevation (no shadow), hover brightens. */
   .duo-card {
@@ -70,17 +125,17 @@ body::before {
     @apply rounded-xl border border-hairline bg-surface transition-colors duration-200;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-[#0A0A0A] shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_3px_rgba(0,0,0,0.5)] transition-all duration-200 hover:bg-accentBright active:scale-[0.98] disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-[#0A0A0A] shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_1px_3px_rgba(0,0,0,0.5)] transition-all duration-200 hover:bg-accentBright disabled:opacity-50;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-hairline bg-transparent px-4 py-2 text-sm font-semibold text-inkDim transition-all duration-200 hover:bg-white/5 hover:text-ink hover:border-hairlineStrong active:scale-[0.98] disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-hairline bg-transparent px-4 py-2 text-sm font-semibold text-inkDim transition-all duration-200 hover:bg-accent/5 hover:text-ink hover:border-hairlineStrong disabled:opacity-50;
   }
   .input {
-    @apply w-full rounded-lg border border-hairline bg-[#0E0E0E] px-3 py-2 text-sm text-ink placeholder:text-inkFaint outline-none transition-colors duration-200 focus:border-accent/70;
+    @apply w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm text-ink placeholder:text-inkFaint outline-none transition-colors duration-200 focus:border-accent/70;
   }
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 5px; border: 2px solid #0A0A0A; }
-::-webkit-scrollbar-thumb:hover { background: #3A3A3A; }
+::-webkit-scrollbar-thumb { background: #C8D6CE; border-radius: 5px; border: 2px solid #F4FAF6; }
+::-webkit-scrollbar-thumb:hover { background: #B8B8C0; }
 ::-webkit-scrollbar-track { background: transparent; }

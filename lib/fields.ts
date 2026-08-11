@@ -18,8 +18,8 @@ export const FIELDS: FieldMeta[] = [
   { key: "DATA", label: "Data", badge: "text-grape bg-grapeSoft border-grape/30", dot: "bg-grape" },
   { key: "BUSINESS", label: "Business", badge: "text-coral bg-coralSoft border-coral/30", dot: "bg-coral" },
   { key: "DESIGN", label: "Design", badge: "text-leaf bg-leafSoft border-leaf/30", dot: "bg-leaf" },
-  { key: "SCIENCE", label: "Science", badge: "text-ink bg-white/[0.05] border-hairline", dot: "bg-teal-300" },
-  { key: "OTHER", label: "General", badge: "text-inkDim bg-white/[0.05] border-hairline", dot: "bg-blue-400" },
+  { key: "SCIENCE", label: "Science", badge: "text-[#0F766E] bg-[#0F766E]/[0.12] border-[#0F766E]/30", dot: "bg-[#0F766E]" },
+  { key: "OTHER", label: "General", badge: "text-inkDim bg-black/[0.05] border-hairline", dot: "bg-inkFaint" },
 ];
 
 export const FIELD_BY_KEY = Object.fromEntries(FIELDS.map((f) => [f.key, f])) as Record<FieldKey, FieldMeta>;

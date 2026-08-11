@@ -24,7 +24,7 @@ interface Application {
 // applied = neutral, screening = blue, interview = yellow, offer = green,
 // rejected = red.
 const COLUMNS: { key: Status; label: string; dot: string; count: string }[] = [
-  { key: "APPLIED", label: "Applied", dot: "bg-white/25", count: "text-inkDim" },
+  { key: "APPLIED", label: "Applied", dot: "bg-black/25", count: "text-inkDim" },
   { key: "SCREENING", label: "Screening", dot: "bg-sky", count: "text-sky" },
   { key: "INTERVIEW", label: "Interview", dot: "bg-sun", count: "text-sun" },
   { key: "OFFER", label: "Offer", dot: "bg-leaf", count: "text-leaf" },
@@ -108,9 +108,9 @@ export default function PipelinePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {COLUMNS.map((col) => (
             <div key={col.key} className="card rounded-lg overflow-hidden">
-              <div className="px-3 py-2.5 flex items-center gap-2 border-b border-hairline bg-white/[0.02]">
+              <div className="px-3 py-2.5 flex items-center gap-2 border-b border-hairline bg-accent/[0.03]">
                 <span className={clsx("w-2.5 h-2.5 rounded-full shrink-0", col.dot)} />
-                <span className="font-display font-bold text-sm text-ink">{col.label}</span>
+                <span className="font-bold text-sm text-ink">{col.label}</span>
                 <span className={clsx("ml-auto font-mono text-xs font-bold px-2 py-0.5 rounded-full bg-paper", col.count)}>
                   {byColumn[col.key].length}
                 </span>
@@ -133,11 +133,14 @@ export default function PipelinePage() {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={clsx(
-                              "bg-surface rounded-lg border border-hairline p-3 cursor-grab active:cursor-grabbing hover:border-white/20 transition-colors duration-200",
+                              "bg-surface rounded-lg border border-hairline p-3 cursor-grab active:cursor-grabbing hover:border-black/20 transition-colors duration-200",
                               snapshot.isDragging && "ring-1 ring-accent border-accent/70"
                             )}
                           >
-                            <div className="font-display font-bold text-sm text-ink">{app.company}</div>
+                            {/* Keyed by status so a card animates in only when it
+                                changes column — reorders within a column don't. */}
+                            <div key={`${app.id}-${app.status}`} className="card-in">
+                              <div className="font-bold text-sm text-ink">{app.company}</div>
                             <div className="text-xs text-inkDim mb-2">{app.role}</div>
                             <div className="flex flex-col gap-1 text-xs text-inkDim font-mono">
                               {app.salaryRange && (
@@ -157,7 +160,7 @@ export default function PipelinePage() {
                                   href={app.jobLink}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs font-bold text-sky flex items-center gap-1 hover:text-[#7DD3FC] transition-colors"
+                                  className="text-xs font-bold text-sky flex items-center gap-1 hover:text-[#0369A1] transition-colors"
                                 >
                                   <ExternalLink size={11} /> Job
                                 </a>
@@ -177,6 +180,7 @@ export default function PipelinePage() {
                                   {app.cvMatch.matchScore}%
                                 </span>
                               )}
+                            </div>
                             </div>
                           </div>
                         )}

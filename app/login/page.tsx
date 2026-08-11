@@ -62,7 +62,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-3">
             <label className="block">
               <span className="text-xs font-semibold text-inkDim uppercase tracking-wide">Email</span>
-              <div className="mt-1 flex items-center gap-2 bg-[#0E0E0E] border border-hairline rounded-lg px-3 focus-within:border-accent/70 transition-colors">
+              <div className="mt-1 flex items-center gap-2 bg-white border border-hairline rounded-lg px-3 focus-within:border-accent/70 transition-colors">
                 <Mail size={15} className="text-inkFaint shrink-0" />
                 <input
                   type="email"
@@ -77,7 +77,7 @@ export default function LoginPage() {
 
             <label className="block">
               <span className="text-xs font-semibold text-inkDim uppercase tracking-wide">Password</span>
-              <div className="mt-1 flex items-center gap-2 bg-[#0E0E0E] border border-hairline rounded-lg px-3 focus-within:border-accent/70 transition-colors">
+              <div className="mt-1 flex items-center gap-2 bg-white border border-hairline rounded-lg px-3 focus-within:border-accent/70 transition-colors">
                 <Lock size={15} className="text-inkFaint shrink-0" />
                 <input
                   type="password"
